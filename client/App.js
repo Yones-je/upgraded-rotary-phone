@@ -20,7 +20,9 @@ export default function App() {
     }, [messagesList]);
 
     const chatMessages = messagesList.map((chatMessage, index) => (
-        <Text key={index}>{chatMessage}</Text>
+        <Text style={styles.chatText} key={index}>
+            {chatMessage}
+        </Text>
     ));
 
     const sendChatMessage = () => {
@@ -53,5 +55,17 @@ const styles = StyleSheet.create({
         height: 40,
         borderWidth: 2,
         top: 600,
+        padding: 5,
+        margin: 10,
+        borderRadius: 12,
+    },
+    chatText: {
+        borderWidth: 1,
+        borderRadius: 12,
+        backgroundColor: "skyblue",
+        textAlign: "center",
+        minWidth: 60,
+        padding: 5,
+        marginBottom: 5,
     },
 });
