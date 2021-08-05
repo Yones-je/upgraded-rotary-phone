@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, TextInput } from "react-native";
+import { AppRegistry } from "react-native";
 import io from "socket.io-client";
 
 export default function App() {
     const [message, setMessage] = useState("");
     const [messagesList, setMessagesList] = useState([]);
+
     const socket = io("http://localhost:5000", {
         jsonp: false,
         transports: ["websocket"],
@@ -22,10 +24,6 @@ export default function App() {
     ));
 
     const sendChatMessage = () => {
-        /*     const socket = io("http://localhost:5000", {
-            jsonp: false,
-            transports: ["websocket"],
-        }); */
         socket.emit("chat message", message);
         setMessage("");
     };
