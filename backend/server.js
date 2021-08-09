@@ -2,6 +2,7 @@ const http = require("http");
 const express = require("express");
 const cors = require("cors");
 const socketIO = require("socket.io");
+const { addUser, removeUser, getUser, getUsersInRoom } = require("./users");
 
 const app = express();
 const server = http.Server(app);
@@ -15,10 +16,30 @@ app.use((req, res, next) => {
 
 // Run when client connects
 io.on("connection", (socket) => {
-    console.log("New WebSocket Connection...");
-    socket.on("chat message", (message) => {
-        console.log(message);
-        io.emit("chat message", message);
+    socket.on("join", ({ name, selectedRoom }, callback) => {
+        const { error, user } = addUser({
+            id: socket.id,
+            name,
+            room: selectedRoom,
+        });
+        if (error) return callback(error);
+        socket.join(user.room);
+        socket.broadcast.to(user.room).emit("message", {
+            user: "ChatBot",
+            text: `User ${name} joined room ${selectedRoom}`,
+        });
+    });
+    socket.on("sendMessage", (message) => {
+        const user = getUser(socket.id);
+        io.to(user.room).emit("message", { user: user.name, text: message });
+    });
+    socket.on("disconnect", () => {
+        const user = getUser(socket.id);
+        socket.broadcast.to(user.room).emit("message", {
+            user: "ChatBot",
+            text: `User ${user.name} disconnected`,
+        });
+        console.log(`User disconnected`);
     });
 });
 

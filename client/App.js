@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Text, View } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
 import { AppRegistry } from "react-native";
-import { Landing } from "./pages";
+import StackNavigator from "./navigation/StackNavigator";
 
 export default function App() {
     return (
-        <View>
-            <Landing />
-        </View>
+        <NavigationContainer>
+            <StackNavigator />
+        </NavigationContainer>
     );
 }

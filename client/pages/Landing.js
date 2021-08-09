@@ -5,33 +5,14 @@ import {
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { H1 } from "../components";
 
-const Landing = () => {
+const Landing = ({ navigation }) => {
     const [name, setName] = useState("");
     const [roomName, setRoomName] = useState("");
-    const [selectedRoom, setSelectedRoom] = useState();
-
-    const pressHandler = () => {
-        Alert.alert(
-            `Your display name is: ${name}`,
-            `The room you're joining is ${selectedRoom}`,
-            [
-                {
-                    text: "Cancel",
-                    onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel",
-                },
-                {
-                    text: "Yes!",
-                    onPress: () => console.log("Yes pressed"),
-                },
-            ]
-        );
-    };
+    const [selectedRoom, setSelectedRoom] = useState("");
 
     return (
         <View style={styles.pageContainer}>
@@ -83,11 +64,15 @@ const Landing = () => {
                 </View>
                 <TouchableOpacity
                     style={styles.btn}
-                    onPress={() =>
+                    onPress={() => {
                         console.log(
                             `Your display name is: ${name} & The room you're joining is ${selectedRoom}`
-                        )
-                    }
+                        );
+                        navigation.navigate("Chat", {
+                            name,
+                            selectedRoom,
+                        });
+                    }}
                 >
                     <Text>Lets Chat!</Text>
                 </TouchableOpacity>

@@ -2,43 +2,58 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, TextInput } from "react-native";
 import io from "socket.io-client";
 
-const Chat = () => {
-    const [message, setMessage] = useState("");
-    const [messagesList, setMessagesList] = useState([]);
+let socket;
 
-    const socket = io("http://localhost:5000", {
-        jsonp: false,
-        transports: ["websocket"],
-    });
+const Chat = ({ route }) => {
+    const { name, selectedRoom } = route.params;
+    const [message, setMessage] = useState("");
+    const [messageList, setMessageList] = useState([]);
+    const ENDPOINT = "http://localhost:5000";
 
     useEffect(() => {
-        socket.on("chat message", (msg) => {
-            console.log(msg);
-            setMessagesList([...messagesList, msg]);
+        socket = io(ENDPOINT, {
+            jsonp: false,
+            transports: ["websocket"],
         });
-    }, [messagesList]);
+        socket.emit("join", { name, selectedRoom });
 
-    const chatMessages = messagesList.map((chatMessage, index) => (
+        return () => {
+            socket.off();
+        };
+    }, [ENDPOINT, route.params]);
+
+    useEffect(() => {
+        socket.on("message", (message) => {
+            setMessageList([...messageList, message]);
+        });
+    }, [messageList]);
+
+    const chatMessages = messageList.map((chatMessage, index) => (
         <Text style={styles.chatText} key={index}>
-            {chatMessage}
+            {chatMessage.text} || By: {chatMessage.user}
         </Text>
     ));
 
     const sendChatMessage = () => {
-        socket.emit("chat message", message);
+        socket.emit("sendMessage", message);
         setMessage("");
     };
 
     return (
         <View style={styles.container}>
+            <Text>
+                Hello {name}! Welcome to #{selectedRoom}
+            </Text>
+            <View style={styles.chatContainer}>
+                <TextInput
+                    style={styles.chatBox}
+                    autoCorrect={false}
+                    value={message}
+                    onChangeText={(message) => setMessage(message)}
+                    onSubmitEditing={() => sendChatMessage()}
+                />
+            </View>
             {chatMessages}
-            <TextInput
-                style={styles.chatBox}
-                autoCorrect={false}
-                value={message}
-                onChangeText={(message) => setMessage(message)}
-                onSubmitEditing={() => sendChatMessage()}
-            />
         </View>
     );
 };
@@ -50,6 +65,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
     },
+    chatContainer: {},
     chatBox: {
         height: 40,
         borderWidth: 2,
