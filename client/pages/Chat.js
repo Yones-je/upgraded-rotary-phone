@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, TextInput } from "react-native";
+import { StyleSheet, Text, View, TextInput, Dimensions } from "react-native";
+import { ChatRoomHeader } from "../components";
 import io from "socket.io-client";
 
 let socket;
@@ -15,7 +16,7 @@ const Chat = ({ route }) => {
             jsonp: false,
             transports: ["websocket"],
         });
-        socket.emit("join", { name, selectedRoom });
+        socket.emit("join", { name, selectedRoom }, (err) => console.log(err));
 
         return () => {
             socket.off();
@@ -44,7 +45,9 @@ const Chat = ({ route }) => {
             <Text>
                 Hello {name}! Welcome to #{selectedRoom}
             </Text>
+            <ChatRoomHeader room={selectedRoom} />
             <View style={styles.chatContainer}>
+                {chatMessages}
                 <TextInput
                     style={styles.chatBox}
                     autoCorrect={false}
@@ -53,19 +56,28 @@ const Chat = ({ route }) => {
                     onSubmitEditing={() => sendChatMessage()}
                 />
             </View>
-            {chatMessages}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        height: Dimensions.get("window").height,
         backgroundColor: "#fff",
         alignItems: "center",
         justifyContent: "center",
     },
-    chatContainer: {},
+    chatContainer: {
+        display: "flex",
+        height: Dimensions.get("window").height / 2,
+        width: Dimensions.get("window").width / 2,
+        marginTop: 60,
+        padding: 10,
+        borderColor: "red",
+        borderWidth: 2,
+        justifyContent: "flex-end",
+        overflow: "scroll",
+    },
     chatBox: {
         height: 40,
         borderWidth: 2,

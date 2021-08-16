@@ -12,7 +12,11 @@ const StackNavigator = () => {
                 component={Landing}
                 options={{ headerShown: false }}
             />
-            <Stack.Screen name='Chat' component={Chat} />
+            <Stack.Screen
+                name='Chat'
+                component={Chat}
+                options={{ title: "Back" }}
+            />
         </Stack.Navigator>
     );
 };
